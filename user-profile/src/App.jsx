@@ -33,6 +33,12 @@ function App() {
     email: ''
   });
 
+  // State management for modal status
+  const [statusMessage, setStatusMessage] = useState('');
+  const [statusType, setStatusType] = useState('');
+  const [showStatusModal, setShowStatusModal] = useState(false);
+
+
   // Function for edit modal
   const openEditModal = (user) => {
     setEditUser(user);
@@ -69,10 +75,16 @@ function App() {
     .then((response) => {
       console.log('User deleted:', response.data);
       setUsers(users.filter(user => user.id !== id));
+      setStatusMessage('User deleted successfully!');
+      setStatusType('success');
+      setShowStatusModal(true);
     })
     .catch((error) => {
       console.error('Error deleting user:', error);
-    });
+      setStatusMessage('Error deleting user!');
+      setStatusType('error');
+      setShowStatusModal(true);
+    }); 
   };
 
   // Add User
@@ -92,10 +104,16 @@ function App() {
         username: '',
         email: ''
       });
+      setStatusMessage('User created successfully!');
+      setStatusType('success');
+      setShowStatusModal(true);
     fetchUsers();
     })
     .catch((error) => {
       console.error('Error creating user:', error);
+      setStatusMessage('Error creating user!');
+      setStatusType('error');
+      setShowStatusModal(true);
     });
   };
 
@@ -116,12 +134,24 @@ function App() {
         username: '',
         email: ''
       });
+      setStatusMessage('User updated successfully!');
+      setStatusType('success');
+      setShowStatusModal(true);
       fetchUsers();
     })
     .catch((error) => {
       console.error('Error updating user:', error);
+      setStatusMessage('Error updating user');
+      setStatusType('error');
     });
   }
+
+  useEffect(() => {
+    if (showStatusModal) {
+      const timer = setTimeout(() => setShowStatusModal(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showStatusModal]);
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
@@ -191,6 +221,17 @@ function App() {
               <input type="text" placeholder="Username" value={editUser.username} onChange={(e) => setEditUser({ ...editUser, username: e.target.value })} />
               <input type="email" placeholder="Email" value={editUser.email} onChange={(e) => setEditUser({ ...editUser, email: e.target.value })} />
               <button onClick={handleUpdate}>Update User</button>
+            </div>
+          </div>
+        )}
+
+        {showStatusModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={() => setShowStatusModal(false)}>&times;</span>
+              <p className={statusType === 'success' ? 'text-green-600' : 'text-red-600'}>
+                {statusMessage}
+              </p>
             </div>
           </div>
         )}
