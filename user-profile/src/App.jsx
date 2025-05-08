@@ -24,6 +24,21 @@ function App() {
     });
   },[])
 
+  const handleDelete = (id) => {
+    axios.delete(`${API_URL}/api/user?userID=${id}`, {
+      headers: {
+        'Authorization': `Bearer ${BEARER_TOKEN}`
+      }
+    })
+    .then((response) => {
+      console.log('User deleted:', response.data);
+      setUsers(users.filter(user => user.id !== id));
+    })
+    .catch((error) => {
+      console.error('Error deleting user:', error);
+    });
+  };
+
 
 
   return (
@@ -38,6 +53,7 @@ function App() {
               <th className="px-4 py-2">Last Name</th>
               <th className="px-4 py-2">Username</th>
               <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
         </table>
@@ -50,6 +66,9 @@ function App() {
               <td className="border px-4 py-2">{user.lastName}</td>
               <td className="border px-4 py-2">{user.username}</td>
               <td className="border px-4 py-2">{user.email}</td>
+              <td className="border px-4 py-2">
+                <button onClick={() => handleDelete(user.id)} className="bg-red-300">Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
